@@ -3,6 +3,7 @@ package id
 import (
 	"fmt"
 	"testing"
+	"time"
 )
 
 func TestGenerate_A(t *testing.T) {
@@ -59,6 +60,27 @@ func TestFromStr(t *testing.T) {
 			fmt.Println(id.ToStr())
 			if got != id {
 				t.Errorf("FromStr() = %v, want %v", got, id)
+			}
+		})
+	}
+}
+
+func Test_durationToNextMillisecond(t *testing.T) {
+	tests := []struct {
+		name string
+		want time.Duration
+	}{
+		{
+			name: "case1",
+			want: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := durationToNextMillisecond()
+			fmt.Println(time.Now().Nanosecond(), got)
+			if got != tt.want {
+				t.Errorf("durationToNextMillisecond() = %v, want %v", got, tt.want)
 			}
 		})
 	}

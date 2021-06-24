@@ -1,9 +1,10 @@
 package id
 
 import (
-	"github.com/sirupsen/logrus"
+	"errors"
+	"log"
 	"strconv"
-	"sync/atomic"
+	"sync"
 	"time"
 )
 
@@ -23,10 +24,10 @@ const (
 	timestampLength = 42                 // 位数
 	serverIdLength  = 11                 // 位数
 	counterLength   = 10                 // 位数
-	timeStampMax    = 0x3FFFFFFFFFF      // 对应bit位的最大值
+	timestampMax    = 0x3FFFFFFFFFF      // 对应bit位的最大值
 	serverIdMax     = 0x7FF              // 对应bit位的最大值
 	counterMax      = 0x3FF              // 对应bit位的最大值
-	timeStampSchema = timeStampMax << 21 // 最大值在指定位置的bit格式，用来参与位运算
+	timestampSchema = timestampMax << 21 // 最大值在指定位置的bit格式，用来参与位运算
 	serverIdSchema  = serverIdMax << 10  // 最大值在指定位置的bit格式，用来参与位运算
 	counterSchema   = counterMax         // 最大值在指定位置的bit格式，用来参与位运算
 )
@@ -37,44 +38,78 @@ const (
 )
 
 var (
-	lastTimeStamp = int64(0) // 上一次生成ID时的 timestamp, ms
+	locker        sync.Mutex
+	once          sync.Once
+	lastTimestamp = int64(0) // 上一次生成ID时的 timestamp, ms
 	serverID      = int64(0) // 服务器ID
 	counter       = int64(0) // 自增计数器
+	isLogEnable   = true
 )
 
 // Init 初始化,  如果没有初始化，生成出的ID的 serverID 部分为0
 func Init(sid int32) {
-	serverID = int64(sid)
+	once.Do(func() {
+		serverID = int64(sid)
+	})
+}
+
+// DisableLog 取消日志
+func DisableLog() {
+	once.Do(func() {
+		isLogEnable = false
+	})
 }
 
 // Generate 获取一个唯一ID，线程安全，无重复风险
 func Generate() ID {
-	// counter达到最大值，等待1ms
-	if counter == counterMax {
-		time.Sleep(time.Millisecond)
-	}
+	locker.Lock()
+	defer locker.Unlock()
+
+	// case1: 如果当前时间跟上次记录的时间不一样: 重置timestamp&counter, 并返回新id
 	ms := msTimeStamp()
-
-	// 如果当前时间跟上次记录的时间不一样: 重置counter
-	if ms != lastTimeStamp {
-		lastTimeStamp = ms
-		atomic.AddInt64(&counter, counterStart-counter)
+	if ms != lastTimestamp {
+		lastTimestamp = ms
+		counter = counterStart
+		return assemble(lastTimestamp, serverID, counter)
 	}
 
-	counter := atomic.AddInt64(&counter, counterIncreaseStep)
-	return assemble(ms, serverID, counter)
+	// case2: 当前的时间跟上次时间一致
+	// case2.1: counter 没有达到最大值
+	if counter < counterMax {
+		counter += counterIncreaseStep
+		return assemble(lastTimestamp, serverID, counter)
+	}
+
+	// case2.2: counter 已经达到最大值，sleep一段时间，重置counter&timestamp
+	needSleepDuration := durationToNextMillisecond()
+	if isLogEnable {
+		log.Println("id counter reach limit, thread will sleep, counter:", counter, "timestamp:", lastTimestamp, "sleep:", needSleepDuration)
+	}
+	time.Sleep(needSleepDuration)
+	lastTimestamp = msTimeStamp()
+	counter = counterStart
+	return assemble(lastTimestamp, serverID, counter)
+}
+
+// durationToNextMillisecond
+func durationToNextMillisecond() time.Duration {
+	microSecondTimeStamp := time.Now().Nanosecond() / 1000 // 当前的微秒数的时间戳
+	millisecond := microSecondTimeStamp % 1000             // 当前的微秒数
+	needSleep := 1000 - millisecond + 1                    // 需要等待的微秒数
+	return time.Microsecond * time.Duration(needSleep)
 }
 
 // GenerateWithDetail 仅供测试使用，业务逻辑请使用Generate方法
 func assemble(timestampMs, serverId, counter int64) ID {
-	if timestampMs&timeStampMax != timestampMs {
+	if timestampMs&timestampMax != timestampMs {
 		panic("assemble id: timestamp is not correct." + strconv.Itoa(int(timestampMs)))
 	}
 	if serverId&serverIdMax != serverId {
 		panic("assemble id: serverID is not correct." + strconv.Itoa(int(timestampMs)))
 	}
 	if counter&counterMax != counter {
-		panic("assemble id: counter is not correct." + strconv.Itoa(int(timestampMs)))
+
+		panic("assemble id: counter is not correct.ts:" + strconv.Itoa(int(timestampMs)) + " counter:" + strconv.Itoa(int(counter)))
 	}
 	i := (timestampMs << (serverIdLength + counterLength)) | (serverId << counterLength) | counter
 	return ID(i)
@@ -84,11 +119,12 @@ func assemble(timestampMs, serverId, counter int64) ID {
 func FromStr(s string) ID {
 	i, err := strconv.ParseInt(s, 16, 64)
 	if err != nil {
-		logrus.Errorf("FromStr failed: %v", s)
+		panic(errors.New("input str can not parse to ID"))
 	}
 	return ID(i)
 }
 
+// msTimeStamp 毫秒为单位的时间戳
 func msTimeStamp() int64 {
 	return time.Now().UnixNano() / 1e6
 }
