@@ -24,15 +24,15 @@ ID is technically an int64:
 |serverId| 11|0x7FF|  2,047 |-|
 |auto increase counter| 10|0x3FF|  1,023 |-|
 
-### usage
+## usage
 
-## install package:
+### install package:
 
 ```bash
 go get git.hardnuts.lab/p1-server/server
 ```
 
-## use:
+### use:
 
 import:
 
