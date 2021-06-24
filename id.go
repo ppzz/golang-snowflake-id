@@ -8,10 +8,6 @@ func (id ID) ToInt64() int64 {
 	return int64(id)
 }
 
-func (id ID) ToInt() int {
-	return int(id)
-}
-
 // GetTimestamp 从ID中取出时间戳 ms
 func (id ID) GetTimestamp() int64 {
 	return int64(id) >> (serverIdLength + counterLength)

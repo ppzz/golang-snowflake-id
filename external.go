@@ -99,3 +99,8 @@ func FromStr(s string) ID {
 	}
 	return ID(i)
 }
+
+// FromInt64 从int64转化为ID
+func FromInt64(i int64) ID {
+	return ID(i)
+}
