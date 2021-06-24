@@ -29,7 +29,7 @@ ID is technically an int64:
 ### install package:
 
 ```bash
-go get git.hardnuts.lab/p1-server/server
+go get github.com/ppzz/golang-snowflake-id
 ```
 
 ### use:
