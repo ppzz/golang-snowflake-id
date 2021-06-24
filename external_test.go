@@ -77,10 +77,10 @@ func Test_durationToNextMillisecond(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := durationToNextMillisecond()
+			got := toNextMillisecond()
 			fmt.Println(time.Now().Nanosecond(), got)
 			if got != tt.want {
-				t.Errorf("durationToNextMillisecond() = %v, want %v", got, tt.want)
+				t.Errorf("toNextMillisecond() = %v, want %v", got, tt.want)
 			}
 		})
 	}

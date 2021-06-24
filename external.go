@@ -81,38 +81,14 @@ func Generate() ID {
 	}
 
 	// case2.2: counter 已经达到最大值，sleep一段时间，重置counter&timestamp
-	needSleepDuration := durationToNextMillisecond()
+	needSleep := toNextMillisecond()
 	if isLogEnable {
-		log.Println("id counter reach limit, thread will sleep, counter:", counter, "timestamp:", lastTimestamp, "sleep:", needSleepDuration)
+		log.Println("id counter reach limit, thread will sleep, counter:", counter, "timestamp:", lastTimestamp, "sleep:", needSleep)
 	}
-	time.Sleep(needSleepDuration)
+	time.Sleep(needSleep)
 	lastTimestamp = msTimeStamp()
 	counter = counterStart
 	return assemble(lastTimestamp, serverID, counter)
-}
-
-// durationToNextMillisecond
-func durationToNextMillisecond() time.Duration {
-	microSecondTimeStamp := time.Now().Nanosecond() / 1000 // 当前的微秒数的时间戳
-	millisecond := microSecondTimeStamp % 1000             // 当前的微秒数
-	needSleep := 1000 - millisecond + 1                    // 需要等待的微秒数
-	return time.Microsecond * time.Duration(needSleep)
-}
-
-// GenerateWithDetail 仅供测试使用，业务逻辑请使用Generate方法
-func assemble(timestampMs, serverId, counter int64) ID {
-	if timestampMs&timestampMax != timestampMs {
-		panic("assemble id: timestamp is not correct." + strconv.Itoa(int(timestampMs)))
-	}
-	if serverId&serverIdMax != serverId {
-		panic("assemble id: serverID is not correct." + strconv.Itoa(int(timestampMs)))
-	}
-	if counter&counterMax != counter {
-
-		panic("assemble id: counter is not correct.ts:" + strconv.Itoa(int(timestampMs)) + " counter:" + strconv.Itoa(int(counter)))
-	}
-	i := (timestampMs << (serverIdLength + counterLength)) | (serverId << counterLength) | counter
-	return ID(i)
 }
 
 // FromStr 字符串转换为ID
@@ -122,9 +98,4 @@ func FromStr(s string) ID {
 		panic(errors.New("input str can not parse to ID"))
 	}
 	return ID(i)
-}
-
-// msTimeStamp 毫秒为单位的时间戳
-func msTimeStamp() int64 {
-	return time.Now().UnixNano() / 1e6
 }

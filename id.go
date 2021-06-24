@@ -4,11 +4,6 @@ import "strconv"
 
 type ID int64
 
-func (id ID) Hello() {
-
-	return
-}
-
 func (id ID) ToInt64() int64 {
 	return int64(id)
 }
