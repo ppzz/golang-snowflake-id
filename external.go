@@ -91,13 +91,29 @@ func Generate() ID {
 	return assemble(lastTimestamp, serverID, counter)
 }
 
-// FromStr 字符串转换为ID
-func FromStr(s string) ID {
-	i, err := strconv.ParseInt(s, 16, 64)
+// FromHexStr 16进制字符串转换为ID
+func FromHexStr(s string) ID {
+	base := 16
+	return parse(s, base)
+}
+
+// FromDecStr 10进制字符串转换为ID
+func FromDecStr(s string) ID {
+	base := 10
+	return parse(s, base)
+}
+
+func parse(s string, base int) ID {
+	i, err := strconv.ParseInt(s, base, 64)
 	if err != nil {
 		panic(errors.New("input str can not parse to ID"))
 	}
 	return ID(i)
+}
+
+// FromString 字符串转换为ID
+func FromString(s string) ID {
+	return FromHexStr(s)
 }
 
 // FromInt64 从int64转化为ID

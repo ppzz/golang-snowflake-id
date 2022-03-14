@@ -8,7 +8,7 @@ import (
 
 func main() {
 	const goroutineCount = 100
-	const idCount = 100 * 10000
+	const idCount = 1000 * 10000
 	ch := make(chan id.ID, idCount)
 
 	id.DisableLog()
@@ -27,10 +27,10 @@ func main() {
 	}
 	sort.Ints(list)
 	uniqList := uniq(list)
-	fmt.Println("created ids:", idCount,
-		"goroutine:", goroutineCount,
-		"generated-id-list-len:", len(list),
-		"id-list-len(after-uniq):", len(uniqList))
+	fmt.Println("created ids count:", idCount,
+		"\nwith goroutine count:", goroutineCount,
+		"\ngenerated-id-list-count:", len(list),
+		"\nid-list-count(after-uniq):", len(uniqList))
 	close(ch)
 }
 

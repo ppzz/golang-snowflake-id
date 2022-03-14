@@ -7,7 +7,9 @@ import (
 )
 
 func TestGenerate_A(t *testing.T) {
-	ids := make([]ID, 100000)
+	// 产生 100 * 1000 个id
+	count := 100 * 000
+	ids := make([]ID, count)
 	for i := range ids {
 		ids[i] = Generate()
 	}
@@ -56,10 +58,10 @@ func TestFromStr(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			id := assemble(tt.args.ts, tt.args.sid, tt.args.c)
-			got := FromStr(id.ToStr())
-			fmt.Println(id.ToStr())
+			got := FromHexStr(id.HexStr())
+			fmt.Println(id.HexStr())
 			if got != id {
-				t.Errorf("FromStr() = %v, want %v", got, id)
+				t.Errorf("FromHexStr() = %v, want %v", got, id)
 			}
 		})
 	}
@@ -68,19 +70,19 @@ func TestFromStr(t *testing.T) {
 func Test_durationToNextMillisecond(t *testing.T) {
 	tests := []struct {
 		name string
-		want time.Duration
 	}{
 		{
 			name: "case1",
-			want: 0,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := toNextMillisecond()
-			fmt.Println(time.Now().Nanosecond(), got)
-			if got != tt.want {
-				t.Errorf("toNextMillisecond() = %v, want %v", got, tt.want)
+			du := time.Duration((time.Now().Nanosecond()/1000)%1000) * time.Microsecond
+			// 1001 是表示休眠时间+ 当前时间应该超过一毫秒
+			// 1002 表示极端情况下， 上一行里取到的时间可能跟 toNextMillisecond 的时间不在一微秒，所以可能是1002
+			if got+du != time.Microsecond*1001 && got+du != time.Microsecond*1002 {
+				t.Errorf("toNextMillisecond() = %v, now %v", got, du)
 			}
 		})
 	}
