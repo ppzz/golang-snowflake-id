@@ -91,6 +91,11 @@ func Generate() ID {
 	return assemble(lastTimestamp, serverID, counter)
 }
 
+// New 获取一个唯一ID，线程安全，无重复风险
+func New() ID {
+	return Generate()
+}
+
 // FromHexStr 16进制字符串转换为ID
 func FromHexStr(s string) ID {
 	base := 16
