@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -118,10 +119,20 @@ func parse(s string, base int) ID {
 
 // FromString 字符串转换为ID
 func FromString(s string) ID {
-	return FromHexStr(s)
+	return FromIdStr(s)
 }
 
 // FromInt64 从int64转化为ID
 func FromInt64(i int64) ID {
 	return ID(i)
+}
+
+func FromIdStr(s string) ID {
+	s = strings.ToLower(s)
+	result := int64(0)
+	for _, item := range s {
+		result = result << 5
+		result = result | listByteToInt[item]
+	}
+	return FromInt64(result)
 }
