@@ -20,7 +20,7 @@ func main() {
 	var list []int
 	for {
 		i := <-ch
-		list = append(list, int(i.ToInt64()))
+		list = append(list, int(i.Int64()))
 		if len(list) >= idCount {
 			break
 		}

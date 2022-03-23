@@ -109,24 +109,7 @@ func FromDecStr(s string) ID {
 	return parse(s, base)
 }
 
-func parse(s string, base int) ID {
-	i, err := strconv.ParseInt(s, base, 64)
-	if err != nil {
-		panic(errors.New("input str can not parse to ID"))
-	}
-	return ID(i)
-}
-
-// FromString 字符串转换为ID
-func FromString(s string) ID {
-	return FromIdStr(s)
-}
-
-// FromInt64 从int64转化为ID
-func FromInt64(i int64) ID {
-	return ID(i)
-}
-
+// FromIdStr 从32进制转为ID
 func FromIdStr(s string) ID {
 	s = strings.ToLower(s)
 	result := int64(0)
@@ -135,4 +118,32 @@ func FromIdStr(s string) ID {
 		result = result | listByteToInt[item]
 	}
 	return FromInt64(result)
+}
+
+// FromString 字符串转换为ID
+func FromString(s string) ID {
+	return FromIdStr(s)
+}
+
+func parse(s string, base int) ID {
+	i, err := strconv.ParseInt(s, base, 64)
+	if err != nil {
+		panic(errors.New("input str can not parse to ID"))
+	}
+	return ID(i)
+}
+
+// FromInt64 从int64转化为ID
+func FromInt64(i int64) ID {
+	return ID(i)
+}
+
+// Index 在一组ids中查找Id,找不到返回-1
+func Index(ids []ID, i ID) int {
+	for index, item := range ids {
+		if item == i {
+			return index
+		}
+	}
+	return -1
 }

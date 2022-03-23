@@ -129,3 +129,24 @@ func TestFromIdStr(t *testing.T) {
 		})
 	}
 }
+
+func TestFromString(t *testing.T) {
+	tests := []struct {
+		name string
+		i    ID
+	}{
+		{
+			name: "case 0",
+			i:    New(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := tt.i.String()
+			result := FromString(s)
+			if result.Int64() != tt.i.Int64() {
+				t.Errorf("FromString() = %v, want %v", result.Int64(), tt.i.Int64())
+			}
+		})
+	}
+}

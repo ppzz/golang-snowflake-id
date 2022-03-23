@@ -6,7 +6,8 @@ import (
 
 type ID int64
 
-func (id ID) ToInt64() int64 {
+// Int64 返回一个id的int64值
+func (id ID) Int64() int64 {
 	return int64(id)
 }
 
@@ -35,19 +36,9 @@ func (id ID) DecStr() string {
 	return strconv.FormatInt(int64(id), 16)
 }
 
-// String 重写 Stringer 接口的的 String 方法
-func (id ID) String() string {
-	return id.IdStr()
-}
-
-// Int64 返回一个id的int64值
-func (id ID) Int64() int64 {
-	return int64(id)
-}
-
 // IdStr 32进制字符串
 func (id ID) IdStr() string {
-	val := id.ToInt64()
+	val := id.Int64()
 	v := int64(0)
 	result := make([]byte, 0)
 
@@ -58,6 +49,11 @@ func (id ID) IdStr() string {
 	}
 	reverse(result)
 	return string(result)
+}
+
+// String 重写 Stringer 接口的的 String 方法
+func (id ID) String() string {
+	return id.IdStr()
 }
 
 func reverse(b []byte) {
