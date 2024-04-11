@@ -15,6 +15,11 @@ func (id ID) Int64() int64 {
 	return int64(id)
 }
 
+// ToInt64 返回一个id的int64值
+func (id ID) ToInt64() int64 {
+	return id.Int64()
+}
+
 // GetTimestamp 从ID中取出时间戳 ms
 func (id ID) GetTimestamp() int64 {
 	temp := unChaos(uint64(id))
