@@ -11,7 +11,7 @@ import (
 
 /*
  * int64位的ID生成器
- * 编码规则: 留一位给系统做符号为，剩余63位可以作为ID的有效位
+ * 编码规则: 留一位给系统做符号位，剩余63位可以作为ID的有效位
  * 1     + 42        + 11        + 10
  * 符号位 + 时间戳(ms) + Server ID + 自增ID
  * 1  bit: 不使用
@@ -41,16 +41,16 @@ const (
 var (
 	locker        sync.Mutex
 	once          sync.Once
-	lastTimestamp = int64(0) // 上一次生成ID时的 timestamp, ms
-	serverID      = int64(0) // 服务器ID
-	counter       = int64(0) // 自增计数器
+	lastTimestamp = uint64(0) // 上一次生成ID时的 timestamp, ms
+	serverID      = uint64(0) // 服务器ID
+	counter       = uint64(0) // 自增计数器
 	isLogEnable   = true
 )
 
 // Init 初始化,  如果没有初始化，生成出的ID的 serverID 部分为0
 func Init(sid int32) {
 	once.Do(func() {
-		serverID = int64(sid)
+		serverID = uint64(sid)
 	})
 }
 
@@ -130,12 +130,12 @@ func parse(s string, base int) ID {
 	if err != nil {
 		panic(errors.New("input str can not parse to ID"))
 	}
-	return ID(i)
+	return NewId(i)
 }
 
 // FromInt64 从int64转化为ID
 func FromInt64(i int64) ID {
-	return ID(i)
+	return NewId(i)
 }
 
 // Index 在一组ids中查找Id,找不到返回-1

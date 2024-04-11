@@ -7,9 +7,9 @@ import (
 
 func TestGetTimestamp_GetServerID_GetCounter(t *testing.T) {
 	type args struct {
-		ts  int64
-		sid int64
-		c   int64
+		ts  uint64
+		sid uint64
+		c   uint64
 	}
 	tests := []struct {
 		name string
@@ -19,7 +19,7 @@ func TestGetTimestamp_GetServerID_GetCounter(t *testing.T) {
 		{
 			name: "case1:普通参数",
 			args: args{
-				ts:  time.Now().UnixNano() / 1e6,
+				ts:  uint64(time.Now().UnixNano() / 1e6),
 				sid: 2011,
 				c:   1001,
 			},
@@ -47,14 +47,14 @@ func TestGetTimestamp_GetServerID_GetCounter(t *testing.T) {
 			ts := id.GetTimestamp()
 			sid := id.GetServerID()
 			c := id.GetCounter()
-			if ts != tt.args.ts {
+			if ts != int64(tt.args.ts) {
 				t.Errorf("GetTimestamp() = %v, id %v", ts, tt.args.ts)
 			}
 
-			if sid != tt.args.sid {
+			if sid != int64(tt.args.sid) {
 				t.Errorf("GetServerID() = %v, id %v", sid, tt.args.sid)
 			}
-			if c != tt.args.c {
+			if c != int64(tt.args.c) {
 				t.Errorf("GetCounter() = %v, id %v", c, tt.args.c)
 			}
 		})

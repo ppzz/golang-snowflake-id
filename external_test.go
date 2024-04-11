@@ -38,9 +38,9 @@ func TestGenerate_A(t *testing.T) {
 
 func TestFromStr(t *testing.T) {
 	type args struct {
-		ts  int64
-		sid int64
-		c   int64
+		ts  uint64
+		sid uint64
+		c   uint64
 	}
 	tests := []struct {
 		name string

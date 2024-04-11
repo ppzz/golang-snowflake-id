@@ -12,17 +12,17 @@
 ID is technically an int64:
 
 * consist of 4 parts: (reserved sign, millisecond timestamp, serverId, auto increase counter)
-  * reserved sign( 预留的符号位 ): 1 bit,
-  * millisecond timestamp( 毫秒时间戳 ): 42 bit
-  * serverId(self defined,can be any val),( 自定义ID ): 11 bit
-  * auto increase counter( 自增计数器 ): 10 bit
+    * reserved sign( 预留的符号位 ): 1 bit,
+    * millisecond timestamp( 毫秒时间戳 ): 42 bit
+    * serverId(self defined,can be any val),( 自定义ID ): 11 bit
+    * auto increase counter( 自增计数器 ): 10 bit
 
-|desc|bit| max| max|note|
-|---|---|---|---|---|
-|reserved sign| 1|0x1|1|not use|
-|millisecond timestamp| 42|0x3FFFFFFFFFF|  4,398,046,511,103| max to "2109-05-15 15:35:11.103 +0800 CST"|
-|serverId| 11|0x7FF|  2,047 |-|
-|auto increase counter| 10|0x3FF|  1,023 |-|
+| desc                  | bit | max           | max               | note                                       |
+|-----------------------|-----|---------------|-------------------|--------------------------------------------|
+| reserved sign         | 1   | 0x1           | 1                 | not use                                    |
+| millisecond timestamp | 42  | 0x3FFFFFFFFFF | 4,398,046,511,103 | max to "2109-05-15 15:35:11.103 +0800 CST" |
+| serverId              | 11  | 0x7FF         | 2,047             | -                                          |
+| auto increase counter | 10  | 0x3FF         | 1,023             | -                                          |
 
 ## usage
 
